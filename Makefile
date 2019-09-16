@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -g -O3 -std=c11
+CFLAGS = -O3 -std=c11 -march=native
 LINKER = gcc
 LFLAGS = -fuse-ld=gold -pthread
 OBJS = gen.o sha2.o isaac64.o

@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <string.h>
 #include "sha2.h"
 #include "isaac64.h"
 
@@ -19,10 +20,9 @@ void seed() {
 
 char letters[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-void randomize_nonce(char* basilisk) {
-	char* nonce = basilisk + 20;
-	for (int i = 0; i < 64; i++) {
-		nonce[i] = letters[rand() % 62];
+void randomize_nonce(char* start, int len) {
+	for (int i = 0; i < len; i++) {
+		start[i] = letters[rand() % 62];
 	}
 }
 
@@ -32,10 +32,20 @@ void find_basilisk(int pipe, int n) {
 	char basilisk[] = "basilisk|0000000000|################################################################ ################################################################";
 	basilisk[18] = '0' + n;
 	seed();
+	randomize_nonce(basilisk+20, 64);
+
+	sha256_ctx ctx_initial;
+	sha256_init(&ctx_initial);
+	sha256_update(&ctx_initial, basilisk, 64);
 
 	while (1) {
-		randomize_nonce(basilisk);
-		sha256(basilisk, 84, (unsigned char*)&output);
+
+		sha256_ctx ctx;
+		memcpy(&ctx, &ctx_initial, sizeof(sha256_ctx));
+		randomize_nonce(basilisk+64, 20);
+		sha256_update(&ctx, basilisk+64, 20);
+		sha256_final(&ctx, (unsigned char*)&output);
+
 		if (output[0] == 0 && output[1] == 0 && output[2] == 0 && output[3] == 0) {
 			break;
 		}
