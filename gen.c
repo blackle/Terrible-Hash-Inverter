@@ -44,7 +44,7 @@ void find_basilisk(int pipe, int n) {
 		memcpy(&ctx, &ctx_initial, sizeof(sha256_ctx));
 		randomize_nonce(basilisk+64, 20);
 		sha256_update(&ctx, basilisk+64, 20);
-		sha256_final(&ctx, (unsigned char*)&output);
+		sha256_final(&ctx, output);
 
 		if (output[0] == 0 && output[1] == 0 && output[2] == 0 && output[3] == 0) {
 			break;
