@@ -19,8 +19,8 @@ void randomize_nonce(basilisk_ctx* basilisk) {
 	}
 }
 
-void increment_nonce(basilisk_ctx* basilisk) {
-	char * start = basilisk->data+64;
+void increment_nonce(sha2562_block* nonce_block) {
+	char * start = nonce_block->x;
 	for (int i = 0; i < 20; i++) {
 		char res = start[i];
 		res++;
@@ -43,29 +43,43 @@ void increment_nonce(basilisk_ctx* basilisk) {
 
 void basilisk_init(basilisk_ctx* basilisk, int n) {
 	memcpy(basilisk->data, basilisk_template, BASILISK_LENGTH*sizeof(char));
-	sha256_init(&basilisk->ctx_initial);
+	sha2562_init(&basilisk->ctx_initial);
 
 	basilisk->data[18] = '0' + n;
 	randomize_nonce(basilisk);
 
-	sha256_update(&basilisk->ctx_initial, basilisk->data, 64);
+	sha2562_block block_initial;
+	memcpy(block_initial.x, basilisk->data, 64);
+	sha2562_calc_block(&basilisk->ctx_initial, &block_initial);
+
+	sha2562_pad_block(&basilisk->block_nonce, 20, 84);
+	sha2562_pad_block(&basilisk->block_final, 32, 32);
+	memcpy(basilisk->block_nonce.x, basilisk->data+64, 20);
 }
 
 void basilisk_step(basilisk_ctx* basilisk) {
-	memcpy(&basilisk->ctx_working, &basilisk->ctx_initial, sizeof(sha256_ctx));
+	memcpy(&basilisk->ctx_working, &basilisk->ctx_initial, sizeof(sha2562_ctx));
 
-	increment_nonce(basilisk);
-	sha256_update(&basilisk->ctx_working, basilisk->data+64, 20);
-	sha256_final(&basilisk->ctx_working, basilisk->output);
-	sha256(basilisk->output, 32, basilisk->output);
+	increment_nonce(&basilisk->block_nonce);
+	sha2562_calc_block(&basilisk->ctx_working, &basilisk->block_nonce);
+
+	sha2562_digest(&basilisk->ctx_working, basilisk->block_final.x);
+
+	sha2562_init(&basilisk->ctx_final);
+	sha2562_calc_block(&basilisk->ctx_final, &basilisk->block_final);
 }
 
 void basilisk_finalize(basilisk_ctx* basilisk) {
+	memcpy(basilisk->data + 64, basilisk->block_nonce.x, 20);
+
+	unsigned char output[32];
+	sha2562_digest(&basilisk->ctx_final, output);
+
 	char *hexdump = basilisk->data + 85;
 	for (int i = 0; i < 64/2; i++) {
 		for (int j = 0; j < 2; j++) {
 			int idx = i*2+j;
-			int value = (j == 0) ? basilisk->output[i] / 16 : basilisk->output[i] % 16;
+			int value = (j == 0) ? output[i] / 16 : output[i] % 16;
 			hexdump[idx] = letters[value];
 		}
 	}

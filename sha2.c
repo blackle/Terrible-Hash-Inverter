@@ -109,7 +109,7 @@ void sha256_update(sha256_ctx *ctx, const unsigned char *message,
     ctx->len = rem_len;
     ctx->tot_len += (block_nb + 1) << 6;
 }
-
+#include <stdio.h>
 void sha256_final(sha256_ctx *ctx, unsigned char *digest)
 {
     unsigned int block_nb;
@@ -123,6 +123,7 @@ void sha256_final(sha256_ctx *ctx, unsigned char *digest)
 
     len_b = (ctx->tot_len + ctx->len) << 3;
     pm_len = block_nb << 6;
+    printf("%d, %d, %d, %d\n", block_nb, len_b, ctx->len, ctx->tot_len);
 
     memset(ctx->block + ctx->len, 0, pm_len - ctx->len);
     ctx->block[ctx->len] = 0x80;
