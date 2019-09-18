@@ -3,26 +3,25 @@
 #include <stdint.h>
 #include <unistd.h>
 #include "basilisk.h"
-#include "isaac64.h"
 
-static const char basilisk_template[] = "basilisk|0000000000|################################################################ ################################################################";
+static const char basilisk_template[] = "basilisk:0000000000:################################################################ ################################################################";
 static const char letters[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-void seed() {
+void randomize_nonce(basilisk_ctx* basilisk) {
+	uint32_t randomness[NONCE_LENGTH];
 	int fd = open("/dev/urandom", O_RDONLY);
-	read(fd, randrsl, sizeof(ub8)*RANDSIZ);
+	read(fd, randomness, sizeof(uint32_t)*NONCE_LENGTH);
 	close(fd);
-	randinit(TRUE);
-}
 
-void randomize_nonce(char* start, int len) {
-	for (int i = 0; i < len; i++) {
-		start[i] = letters[rand() % 62];
+	char * start = basilisk->data+20;
+	for (int i = 0; i < NONCE_LENGTH; i++) {
+		start[i] = letters[randomness[i] % 62];
 	}
 }
 
-void increment_nonce(char* start, int len) {
-	for (int i = 0; i < len; i++) {
+void increment_nonce(basilisk_ctx* basilisk) {
+	char * start = basilisk->data+64;
+	for (int i = 0; i < 20; i++) {
 		char res = start[i];
 		res++;
 		switch (res) {
@@ -47,8 +46,7 @@ void basilisk_init(basilisk_ctx* basilisk, int n) {
 	sha256_init(&basilisk->ctx_initial);
 
 	basilisk->data[18] = '0' + n;
-	seed();
-	randomize_nonce(basilisk->data+20, 64);
+	randomize_nonce(basilisk);
 
 	sha256_update(&basilisk->ctx_initial, basilisk->data, 64);
 }
@@ -56,7 +54,7 @@ void basilisk_init(basilisk_ctx* basilisk, int n) {
 void basilisk_step(basilisk_ctx* basilisk) {
 	memcpy(&basilisk->ctx_working, &basilisk->ctx_initial, sizeof(sha256_ctx));
 
-	increment_nonce(basilisk->data+64, 20);
+	increment_nonce(basilisk);
 	sha256_update(&basilisk->ctx_working, basilisk->data+64, 20);
 	sha256_final(&basilisk->ctx_working, basilisk->output);
 	sha256(basilisk->output, 32, basilisk->output);

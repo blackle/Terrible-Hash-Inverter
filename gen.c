@@ -12,7 +12,6 @@
 
 static const char hex[] = "0123456789abcdef";
 
-
 void find_basilisk(int pipe, int n) {
 	basilisk_ctx basilisk;
 	basilisk_init(&basilisk, n);
