@@ -23,14 +23,7 @@ void find_basilisk(int pipe, int n) {
 			break;
 		}
 	}
-	char *hexdump = basilisk.data + 85;
-	for (int i = 0; i < 64/2; i++) {
-		for (int j = 0; j < 2; j++) {
-			int idx = i*2+j;
-			int value = (j == 0) ? basilisk.output[i] / 16 : basilisk.output[i] % 16;
-			hexdump[idx] = hex[value];
-		}
-	}
+	basilisk_finalize(&basilisk);
 	write(pipe, basilisk.data, BASILISK_LENGTH);
 }
 

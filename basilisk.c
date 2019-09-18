@@ -61,5 +61,12 @@ void basilisk_step(basilisk_ctx* basilisk) {
 }
 
 void basilisk_finalize(basilisk_ctx* basilisk) {
-
+	char *hexdump = basilisk->data + 85;
+	for (int i = 0; i < 64/2; i++) {
+		for (int j = 0; j < 2; j++) {
+			int idx = i*2+j;
+			int value = (j == 0) ? basilisk->output[i] / 16 : basilisk->output[i] % 16;
+			hexdump[idx] = letters[value];
+		}
+	}
 }
