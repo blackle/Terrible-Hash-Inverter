@@ -26,3 +26,10 @@ The second is `gen`, which will find a nonce value so the string `basilisk:00000
 $ ./gen 0
 basilisk:0000000000:qPAZ7WhrpBKrq28XtMxHffnsCYFC74EKlmktoXhBZj0GKnQCQtMYfXxpNib9ak7q 00000000be9f66ca22673497cab50359f21809f91714d26a716252eafcb6964e
 ```
+
+These are double-applied hashes like those in bitcoin protocol. To verify:
+
+```bash
+$ echo -en 'basilisk:0000000000:qPAZ7WhrpBKrq28XtMxHffnsCYFC74EKlmktoXhBZj0GKnQCQtMYfXxpNib9ak7q' | openssl dgst -sha256 -binary | openssl dgst -sha256
+(stdin)= 00000000be9f66ca22673497cab50359f21809f91714d26a716252eafcb6964e
+```
