@@ -8,57 +8,31 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
-#include "sha2.h"
-#include "isaac64.h"
+#include "basilisk.h"
 
-void seed() {
-	int fd = open("/dev/urandom", O_RDONLY);
-	read(fd, randrsl, sizeof(ub8)*RANDSIZ);
-	close(fd);
-	randinit(TRUE);
-}
+static const char hex[] = "0123456789abcdef";
 
-char letters[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-void randomize_nonce(char* start, int len) {
-	for (int i = 0; i < len; i++) {
-		start[i] = letters[rand() % 62];
-	}
-}
 
 void find_basilisk(int pipe, int n) {
-
-	unsigned char output[32];
-	char basilisk[] = "basilisk|0000000000|################################################################ ################################################################";
-	basilisk[18] = '0' + n;
-	seed();
-	randomize_nonce(basilisk+20, 64);
-
-	sha256_ctx ctx_initial;
-	sha256_init(&ctx_initial);
-	sha256_update(&ctx_initial, basilisk, 64);
+	basilisk_ctx basilisk;
+	basilisk_init(&basilisk, n);
 
 	while (1) {
+		basilisk_step(&basilisk);
 
-		sha256_ctx ctx;
-		memcpy(&ctx, &ctx_initial, sizeof(sha256_ctx));
-		randomize_nonce(basilisk+64, 20);
-		sha256_update(&ctx, basilisk+64, 20);
-		sha256_final(&ctx, output);
-
-		if (output[0] == 0 && output[1] == 0 && output[2] == 0 && output[3] == 0) {
+		if (basilisk.output[0] == 0 && basilisk.output[1] == 0 && basilisk.output[2] == 0 /*&& basilisk.output[3] == 0*/) {
 			break;
 		}
 	}
-	char *hexdump = basilisk + 85;
+	char *hexdump = basilisk.data + 85;
 	for (int i = 0; i < 64/2; i++) {
 		for (int j = 0; j < 2; j++) {
 			int idx = i*2+j;
-			int value = (j == 0) ? output[i] / 16 : output[i] % 16;
-			hexdump[idx] = letters[value];
+			int value = (j == 0) ? basilisk.output[i] / 16 : basilisk.output[i] % 16;
+			hexdump[idx] = hex[value];
 		}
 	}
-	write(pipe, basilisk, 150);
+	write(pipe, basilisk.data, BASILISK_LENGTH);
 }
 
 #define POOLSIZE 8
@@ -79,8 +53,8 @@ int main(int argc, char** argv) {
 			return 0;
 		}
 	}
-	char winning_basilisk[150];
-	read(pipes[0], winning_basilisk, 150);
+	char winning_basilisk[BASILISK_LENGTH];
+	read(pipes[0], winning_basilisk, BASILISK_LENGTH);
 	printf(winning_basilisk);
 	printf("\n");
 
