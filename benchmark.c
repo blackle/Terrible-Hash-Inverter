@@ -22,6 +22,7 @@ int main(int argc, char** argv) {
 		return -1;
 	}
 	int count = atoi(argv[1]);
+	// TODO: add MH/s calculation in here and print it out
 
 	for (int i = 0; i < POOL_SIZE; i++) {
 		if (fork() == 0) {
