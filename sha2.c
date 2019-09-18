@@ -37,7 +37,8 @@
 #include <stdlib.h>
 
 #include "sha2.h"
-#include "sha2_sse4.h"
+#include "sha256_sse4.h"
+#include "sha256_avx1.h"
 
 #define UNPACK32(x, str)                      \
 {                                             \
@@ -70,7 +71,7 @@ uint32_t sha256_h0[8] =
 void sha256_transf(sha256_ctx *ctx, const unsigned char *message,
                    unsigned int block_nb)
 {
-    sha256_sse4(message, ctx->h, block_nb);
+    sha256_avx(message, ctx->h, block_nb);
     return;
 }
 
