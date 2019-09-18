@@ -7,6 +7,7 @@
 #include "sha2.h"
 #include "sha256_sse4.h"
 #include "sha256_avx1.h"
+#include "sha256_avx2_rorx2.h"
 
 uint32_t sha256_h0[8] = {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
 
@@ -27,7 +28,18 @@ void sha256_pad_block(sha256_block * block, int offset, int length) {
 }
 
 void sha256_calc_block(sha256_ctx * ctx, sha256_block * block) {
+#if defined(__AVX2__)
+#pragma message "Using AVX2 accelerated SHA256 transformer"
 	sha256_avx(block->x, ctx->s, 1);
+#elif defined(__AVX__)
+#pragma message "Using AVX accelerated SHA256 transformer"
+	sha256_avx(block->x, ctx->s, 1);
+#elif defined(__SSE4_1__)
+#pragma message "Using SSE4 accelerated SHA256 transformer"
+	sha256_sse4(block->x, ctx->s, 1);
+#else
+#error "No accelerated SHA256 transformer available for this platform!"
+#endif
 }
 
 void sha256_digest(sha256_ctx * ctx, unsigned char* digest) {
