@@ -30,7 +30,7 @@ void sha256_pad_block(sha256_block * block, int offset, int length) {
 void sha256_calc_block(sha256_ctx * ctx, sha256_block * block) {
 #if defined(__AVX2__)
 #pragma message "Using AVX2 accelerated SHA256 transformer"
-	sha256_avx(block->x, ctx->s, 1);
+	sha256_rorx(block->x, ctx->s, 1);
 #elif defined(__AVX__)
 #pragma message "Using AVX accelerated SHA256 transformer"
 	sha256_avx(block->x, ctx->s, 1);
