@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
 	for (int i = 0; i < POOL_SIZE; i++) {
 		if (fork() == 0) {
 			prctl(PR_SET_PDEATHSIG, SIGHUP);
-			basilisk_stress(count);
+			basilisk_stress(count / POOL_SIZE);
 			return 0;
 		}
 	}
@@ -40,10 +40,10 @@ int main(int argc, char** argv) {
 
 	gettimeofday(&end, NULL);
 	float time = (end.tv_sec - start.tv_sec) + (end.tv_usec - start.tv_usec) / 1000000.0;
-	int total = count * POOL_SIZE;
+	int total = count;
 	float hps = total / time;
 
-	printf("%d hashes computed\n", total);
+	printf("%d hashes computed, %d threads\n", total, POOL_SIZE);
 	printf("%.2f seconds taken\n", time);
 	printf("%.2f million hashes per second\n", hps/1000000);
 
