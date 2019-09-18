@@ -4,6 +4,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <sys/time.h>
 #include "basilisk.h"
 
 #define POOL_SIZE 8
@@ -22,7 +23,9 @@ int main(int argc, char** argv) {
 		return -1;
 	}
 	int count = atoi(argv[1]);
-	// TODO: add MH/s calculation in here and print it out
+
+	struct timeval start, end;
+	gettimeofday(&start, NULL);
 
 	for (int i = 0; i < POOL_SIZE; i++) {
 		if (fork() == 0) {
@@ -34,6 +37,15 @@ int main(int argc, char** argv) {
 
 	int status = 0;
 	while (wait(&status) > 0);
+
+	gettimeofday(&end, NULL);
+	float time = (end.tv_sec - start.tv_sec) + (end.tv_usec - start.tv_usec) / 1000000.0;
+	int total = count * POOL_SIZE;
+	float hps = total / time;
+
+	printf("%d hashes computed\n", total);
+	printf("%.2f seconds taken\n", time);
+	printf("%.2f million hashes per second\n", hps/1000000);
 
 	return 0;
 }
