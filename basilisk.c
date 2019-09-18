@@ -21,6 +21,27 @@ void randomize_nonce(char* start, int len) {
 	}
 }
 
+void increment_nonce(char* start, int len) {
+	for (int i = 0; i < len; i++) {
+		char res = start[i];
+		res++;
+		switch (res) {
+			case '{':
+				start[i] = '0';
+				continue;
+			case '[':
+				start[i] = 'a';
+				return;
+			case ':':
+				start[i] = 'A';
+				return;
+			default:
+				start[i] = res;
+				return;
+		}
+	}
+}
+
 void basilisk_init(basilisk_ctx* basilisk, int n) {
 	memcpy(basilisk->data, basilisk_template, BASILISK_LENGTH*sizeof(char));
 	sha256_init(&basilisk->ctx_initial);
@@ -35,7 +56,7 @@ void basilisk_init(basilisk_ctx* basilisk, int n) {
 void basilisk_step(basilisk_ctx* basilisk) {
 	memcpy(&basilisk->ctx_working, &basilisk->ctx_initial, sizeof(sha256_ctx));
 
-	randomize_nonce(basilisk->data+64, 20);
+	increment_nonce(basilisk->data+64, 20);
 	sha256_update(&basilisk->ctx_working, basilisk->data+64, 20);
 	sha256_final(&basilisk->ctx_working, basilisk->output);
 	sha256(basilisk->output, 32, basilisk->output);
