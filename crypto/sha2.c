@@ -28,7 +28,6 @@ void sha256_pad_block(sha256_block * block, int offset, int length) {
 
 void sha256_calc_block(sha256_ctx * ctx, sha256_block * block) {
 	sha256_avx(block->x, ctx->s, 1);
-	return;
 }
 
 void sha256_digest(sha256_ctx * ctx, unsigned char* digest) {
