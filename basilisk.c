@@ -20,7 +20,7 @@ void randomize_nonce(basilisk_ctx* basilisk) {
 }
 
 void increment_nonce(sha256_block* nonce_block) {
-	char * start = nonce_block->x;
+	unsigned char * start = nonce_block->x;
 	for (int i = 0; i < 20; i++) {
 		char res = start[i];
 		res++;

@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -O3 -std=c11 -march=native
+CFLAGS = -O3 -std=c11 -march=native -Wall -Wextra -Werror
 LINKER = gcc
 LFLAGS = -fuse-ld=gold -pthread
 OBJS = basilisk.o crypto/sha2.o crypto/sha256_sse4.o crypto/sha256_avx1.o

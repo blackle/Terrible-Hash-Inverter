@@ -45,8 +45,7 @@ int main(int argc, char** argv) {
 	}
 	char winning_basilisk[BASILISK_LENGTH];
 	read(pipes[0], winning_basilisk, BASILISK_LENGTH);
-	printf(winning_basilisk);
-	printf("\n");
+	printf("%s\n", winning_basilisk);
 
 	return 0;
 }
