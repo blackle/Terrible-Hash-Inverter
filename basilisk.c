@@ -60,6 +60,7 @@ void basilisk_init(basilisk_ctx* basilisk, int n) {
 void basilisk_step(basilisk_ctx* basilisk) {
 	memcpy(&basilisk->ctx_working, &basilisk->ctx_initial, sizeof(sha2562_ctx));
 
+	//for performance reasons, we increment the nonce inside the already padded block
 	increment_nonce(&basilisk->block_nonce);
 	sha2562_calc_block(&basilisk->ctx_working, &basilisk->block_nonce);
 
@@ -70,6 +71,7 @@ void basilisk_step(basilisk_ctx* basilisk) {
 }
 
 void basilisk_finalize(basilisk_ctx* basilisk) {
+	//copy the calculated nonce back into the plaintext
 	memcpy(basilisk->data + 64, basilisk->block_nonce.x, 20);
 
 	unsigned char output[32];

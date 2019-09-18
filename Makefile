@@ -2,17 +2,14 @@ CC = gcc
 CFLAGS = -O3 -std=c11 -march=native
 LINKER = gcc
 LFLAGS = -fuse-ld=gold -pthread
-OBJS = sha2.o sha22.o basilisk.o sha256_sse4.o sha256_avx1.o
+OBJS = sha22.o basilisk.o sha256_sse4.o sha256_avx1.o
 
-all : gen benchmark validate
+all : gen benchmark
 
 gen : gen.o $(OBJS)
 	$(LINKER) $(LFLAGS) -o $@ $^
 
 benchmark : benchmark.o $(OBJS)
-	$(LINKER) $(LFLAGS) -o $@ $^
-
-validate : validate.o $(OBJS)
 	$(LINKER) $(LFLAGS) -o $@ $^
 
 sha256_%.o : sha256_%.asm
