@@ -35,32 +35,13 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <byteswap.h>
 
 #include "sha2.h"
 #include "sha256_sse4.h"
 #include "sha256_avx1.h"
 
-#define UNPACK32(x, str)                      \
-{                                             \
-    *((str) + 3) = (uint8_t) ((x)      );       \
-    *((str) + 2) = (uint8_t) ((x) >>  8);       \
-    *((str) + 1) = (uint8_t) ((x) >> 16);       \
-    *((str) + 0) = (uint8_t) ((x) >> 24);       \
-}
-
-#define PACK32(str, x)                        \
-{                                             \
-    *(x) =   ((uint32_t) *((str) + 3)      )    \
-           | ((uint32_t) *((str) + 2) <<  8)    \
-           | ((uint32_t) *((str) + 1) << 16)    \
-           | ((uint32_t) *((str) + 0) << 24);   \
-}
-
-#define SHA256_SCR(i)                         \
-{                                             \
-    w[i] =  SHA256_F4(w[i -  2]) + w[i -  7]  \
-          + SHA256_F3(w[i - 15]) + w[i - 16]; \
-}
+#define UNPACK32(x, str) *(uint32_t*)(str) = __bswap_32(x)
 
 uint32_t sha256_h0[8] =
             {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
