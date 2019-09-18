@@ -13,11 +13,10 @@ $ make
 There are two programs generated. `benchmark` will run X number of hashes. This is used to benchmark the hashing speed:
 
 ```bash
-$ time ./benchmark 10000000
-
-real	0m#.###s
-user	0m#.###s
-sys	0m0.000s
+$ ./benchmark 10000000
+80000000 hashes computed
+7.97 seconds taken
+10.04 million hashes per second
 ```
 
 The second is `gen`, which will find a nonce value so the string `basilisk:000000000N:<nonce>` gives a hash with eight zeros.
