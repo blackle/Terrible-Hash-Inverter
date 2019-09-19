@@ -40,7 +40,6 @@ int main(int argc, char** argv) {
 				fprintf(stderr, "failed to setup SIGHUP handler\n");
 				exit(1);
 			}
-			//prctl(PR_SET_PDEATHSIG, SIGHUP);
 			basilisk_stress(count / POOL_SIZE);
 			return 0;
 		}
