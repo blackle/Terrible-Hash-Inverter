@@ -3,6 +3,7 @@ This code is from StackOverflow user jww, posted here: https://stackoverflow.com
 per StackOverflow, code is licensed under CC-BY-SA 3.0 - https://creativecommons.org/licenses/by-sa/3.0/
 */
 
+#if defined(__SHA__)
 #include <stdint.h>
 #include <immintrin.h>
 
@@ -198,3 +199,4 @@ void sha256_ishaext(uint32_t state[8], const uint8_t input[], size_t blocks)
     _mm_storeu_si128((__m128i*) &state[0], STATE0);
     _mm_storeu_si128((__m128i*) &state[4], STATE1);
 }
+#endif
