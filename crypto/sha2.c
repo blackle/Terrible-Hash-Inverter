@@ -12,7 +12,11 @@
 #include <libkern/OSByteOrder.h>
 #define __bswap_32 OSSwapInt32
 #else
-#error No byteswap implementation on this platform!
+#pragma message "WARNING: using unaccelerated bswap32"
+inline uint32_t bswap32(uint32_t x) {
+	return (((x & 0xFF000000) >> 24) | ((x & 0x00FF0000) >> 8) | ((x & 0x0000FF00) << 8) | ((x & 0x000000FF) << 24));
+}
+#define __bswap_32 bswap32
 #endif
 
 #include "sha2.h"
