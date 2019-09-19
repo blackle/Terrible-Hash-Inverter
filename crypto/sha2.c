@@ -24,6 +24,7 @@ inline uint32_t bswap32(uint32_t x) {
 #include "sha256_avx1.h"
 #include "sha256_avx2_rorx2.h"
 #include "sha256_ishaext.h"
+#include "sha256_slow.h"
 
 uint32_t sha256_h0[8] = {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
 
@@ -57,7 +58,8 @@ void sha256_calc_block(sha256_ctx * ctx, sha256_block * block) {
 #pragma message "Using SSE4 accelerated SHA256 transformer"
 	sha256_sse4(block->x, ctx->s, 1);
 #else
-#error "No accelerated SHA256 transformer available for this platform!"
+#pragma message "No accelerated SHA256 transformer available for this platform"
+	sha256_slow(block->x, ctx->s);
 #endif
 }
 

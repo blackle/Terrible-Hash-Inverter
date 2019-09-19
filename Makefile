@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -O3 -std=c11 -march=native -Wall -Wextra -Werror -flto
 LINKER = gcc
 LFLAGS = -pthread -flto
-OBJS = basilisk.o crypto/sha2.o crypto/sha256_sse4.o crypto/sha256_avx1.o crypto/sha256_avx2_rorx2.o crypto/sha256_ishaext.o
+OBJS = basilisk.o crypto/sha2.o crypto/sha256_sse4.o crypto/sha256_avx1.o crypto/sha256_avx2_rorx2.o crypto/sha256_ishaext.o crypto/sha256_slow.o
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)

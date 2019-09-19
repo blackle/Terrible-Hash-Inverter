@@ -1,0 +1,1 @@
+void sha256_slow( const uint8_t* data, uint32_t digest[8] );
