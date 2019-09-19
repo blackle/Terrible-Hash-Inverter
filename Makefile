@@ -21,7 +21,7 @@ benchmark : benchmark.o $(OBJS)
 
 sha256_%.o : sha256_%.asm
 ifeq ($(OS),OSX)
-	yasm -f x64 -f macho64 -D LINUX -o $@ $^
+	yasm -f x64 -f macho64 -D MANGLE -D LINUX -o $@ $^
 else
 	yasm -f x64 -f elf64 -X gnu -g dwarf2 -D LINUX -o $@ $^
 endif

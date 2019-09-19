@@ -411,10 +411,15 @@ rotate_Xs
 ;; arg 1 : pointer to input data
 ;; arg 2 : pointer to digest
 ;; arg 3 : Num blocks
+%ifdef MANGLE
+%define FNAME _sha256_avx
+%else
+%define FNAME sha256_avx
+%endif
 section .text
-global sha256_avx
+global FNAME
 align 32
-sha256_avx:
+FNAME:
 	push	rbx
 %ifndef LINUX
 	push	rsi
