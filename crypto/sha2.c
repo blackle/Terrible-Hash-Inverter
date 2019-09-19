@@ -2,27 +2,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <assert.h>
-
-#ifdef __has_include
-#if __has_include("byteswap.h")
-#define __bswap_32 bswap_32
-#include <byteswap.h>
-#elif __has_include("machine/bswap.h")
-#include <machine/bswap.h>
-#define __bswap_32 __byte_swap_u32_variable
-#elif __has_include("libkern/OSByteOrder.h")
-#include <libkern/OSByteOrder.h>
-#define __bswap_32 OSSwapInt32
-#endif
-#endif //__has_include
-
-#ifndef __bswap_32
-#pragma message "WARNING: using unaccelerated bswap32"
-inline uint32_t bswap32(uint32_t x) {
-	return (((x & 0xFF000000) >> 24) | ((x & 0x00FF0000) >> 8) | ((x & 0x0000FF00) << 8) | ((x & 0x000000FF) << 24));
-}
-#define __bswap_32 bswap32
-#endif
+#include <arpa/inet.h>
 
 #include "sha2.h"
 #include "sha256_sse4.h"
@@ -46,7 +26,7 @@ void sha256_pad_block(sha256_block * block, int offset, int length) {
 	memset(block->x + offset, 0, pm_len - offset);
 	block->x[offset] = 0x80;
 	uint32_t* encoded_len = (uint32_t*)(block->x + pm_len - 4);
-	*encoded_len = __bswap_32(len_b);
+	*encoded_len = htonl(len_b);
 }
 
 void sha256_calc_block(sha256_ctx * ctx, sha256_block * block) {
@@ -71,6 +51,6 @@ void sha256_calc_block(sha256_ctx * ctx, sha256_block * block) {
 void sha256_digest(sha256_ctx * ctx, unsigned char* digest) {
 	uint32_t* digest_32 = (uint32_t*)digest;
 	for (int i = 0 ; i < 8; i++) {
-		digest_32[i] = __bswap_32(ctx->s[i]);
+		digest_32[i] = htonl(ctx->s[i]);
 	}
 }
