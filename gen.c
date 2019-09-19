@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/prctl.h>
 #include <fcntl.h>
 #include <stdint.h>
 #include <unistd.h>
@@ -9,6 +8,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "basilisk.h"
+
+void handle_sighup(int signal) {                                                                                                                                                   
+	exit(signal);                                                                                                                                                              
+}  
 
 void find_basilisk(int pipe, int n) {
 	basilisk_ctx basilisk;
@@ -37,7 +40,13 @@ int main(int argc, char** argv) {
 
 	for (int i = 0; i < POOLSIZE; i++) {
 		if (fork() == 0) {
-			prctl(PR_SET_PDEATHSIG, SIGHUP);
+			struct sigaction sa;
+			sa.sa_handler = &handle_sighup;
+			sa.sa_flags = SA_RESTART;
+			if (sigaction(SIGHUP, &sa, NULL) < 0) {
+				fprintf(stderr, "failed to setup SIGHUP handler\n");
+				exit(1);
+			}
 			close(pipes[0]);
 			find_basilisk(pipes[1], number);
 			return 0;

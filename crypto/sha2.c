@@ -1,8 +1,16 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <byteswap.h>
 #include <assert.h>
+
+#if __has_include("byteswap.h")
+#include <byteswap.h>
+#elif __has_include("machine/bswap.h")
+#include <machine/bswap.h>
+#define __bswap_32 __byte_swap_u32_variable
+#else
+#error No byteswap implementation on this platform!
+#endif
 
 #include "sha2.h"
 #include "sha256_sse4.h"

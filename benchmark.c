@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <sys/prctl.h>
 #include <sys/wait.h>
 #include <signal.h>
 #include <unistd.h>
@@ -8,6 +7,10 @@
 #include "basilisk.h"
 
 #define POOL_SIZE 8
+
+void handle_sighup(int signal) {
+	exit(signal);
+}
 
 void basilisk_stress(int count) {
 	basilisk_ctx basilisk;
@@ -29,7 +32,14 @@ int main(int argc, char** argv) {
 
 	for (int i = 0; i < POOL_SIZE; i++) {
 		if (fork() == 0) {
-			prctl(PR_SET_PDEATHSIG, SIGHUP);
+			struct sigaction sa;
+			sa.sa_handler = &handle_sighup;
+			sa.sa_flags = SA_RESTART;
+			if (sigaction(SIGHUP, &sa, NULL) < 0) {
+				fprintf(stderr, "failed to setup SIGHUP handler\n");
+				exit(1);
+			}
+			//prctl(PR_SET_PDEATHSIG, SIGHUP);
 			basilisk_stress(count / POOL_SIZE);
 			return 0;
 		}
