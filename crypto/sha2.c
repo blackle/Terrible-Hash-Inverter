@@ -16,6 +16,7 @@
 #include "sha256_sse4.h"
 #include "sha256_avx1.h"
 #include "sha256_avx2_rorx2.h"
+#include "sha256_ishaext.h"
 
 uint32_t sha256_h0[8] = {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
 
@@ -36,7 +37,10 @@ void sha256_pad_block(sha256_block * block, int offset, int length) {
 }
 
 void sha256_calc_block(sha256_ctx * ctx, sha256_block * block) {
-#if defined(__AVX2__)
+#if defined(__SHA__)
+#pragma message "Using Intel SHA extensions accelerated SHA256 transformer"
+	sha256_ishaext(ctx->s, block->x, 1);
+#elif defined(__AVX2__)
 #pragma message "Using AVX2 accelerated SHA256 transformer"
 	sha256_rorx(block->x, ctx->s, 1);
 #elif defined(__AVX__)
