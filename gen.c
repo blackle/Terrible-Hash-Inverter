@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -9,9 +10,9 @@
 #include <string.h>
 #include "basilisk.h"
 
-void handle_sighup(int signal) {                                                                                                                                                   
-	exit(signal);                                                                                                                                                              
-}  
+void handle_sighup(int signal) {
+	exit(signal);
+}
 
 void find_basilisk(int pipe, int n) {
 	basilisk_ctx basilisk;
