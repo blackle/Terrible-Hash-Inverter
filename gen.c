@@ -21,9 +21,9 @@ void find_basilisk(int pipe, int n) {
 	while (1) {
 		basilisk_step(&basilisk);
 
-		//if (basilisk.ctx_final.s[0] == 0 && basilisk.ctx_final.s[1] < (1 << 24)) {
+		if (basilisk.ctx_final.s[0] == 0 && basilisk.ctx_final.s[1] < (1 << 24)) {
 			break;
-		//}
+		}
 	}
 	basilisk_finalize(&basilisk);
 	if ( write(pipe, basilisk.data, BASILISK_LENGTH) < 0 ) {
@@ -35,7 +35,7 @@ void find_basilisk(int pipe, int n) {
 
 int main(int argc, char** argv) {
 	int pipes[2];
-	if ( ! pipe((int*)&pipes) ) {
+	if ( pipe((int*)&pipes) < 0 ) {
 		return -1;
 	}
 	if (argc != 2) {
