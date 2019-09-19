@@ -7,7 +7,7 @@
 #include <sys/time.h>
 #include "basilisk.h"
 
-#define POOL_SIZE 8
+#define POOL_SIZE 1
 
 void basilisk_stress(int count) {
 	basilisk_ctx basilisk;

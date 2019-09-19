@@ -17,7 +17,7 @@ void find_basilisk(int pipe, int n) {
 	while (1) {
 		basilisk_step(&basilisk);
 
-		if (basilisk.ctx_final.s[0] == 0) {
+		if (basilisk.ctx_final.s[0] < (1 << 4)) {
 			break;
 		}
 	}
@@ -25,7 +25,7 @@ void find_basilisk(int pipe, int n) {
 	write(pipe, basilisk.data, BASILISK_LENGTH);
 }
 
-#define POOLSIZE 8
+#define POOLSIZE 1
 
 int main(int argc, char** argv) {
 	int pipes[2];
