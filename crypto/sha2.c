@@ -8,6 +8,9 @@
 #elif __has_include("machine/bswap.h")
 #include <machine/bswap.h>
 #define __bswap_32 __byte_swap_u32_variable
+#elif __has_include("libkern/OSByteOrder.h")
+#include <libkern/OSByteOrder.h>
+#define __bswap_32 OSSwapInt32
 #else
 #error No byteswap implementation on this platform!
 #endif
