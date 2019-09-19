@@ -21,19 +21,23 @@ void find_basilisk(int pipe, int n) {
 	while (1) {
 		basilisk_step(&basilisk);
 
-		if (basilisk.ctx_final.s[0] == 0 && basilisk.ctx_final.s[1] < (1 << 24)) {
+		//if (basilisk.ctx_final.s[0] == 0 && basilisk.ctx_final.s[1] < (1 << 24)) {
 			break;
-		}
+		//}
 	}
 	basilisk_finalize(&basilisk);
-	write(pipe, basilisk.data, BASILISK_LENGTH);
+	if ( write(pipe, basilisk.data, BASILISK_LENGTH) < 0 ) {
+		fprintf( stderr, "error writing to pipe\n" );
+	}
 }
 
 #define POOLSIZE 8
 
 int main(int argc, char** argv) {
 	int pipes[2];
-	pipe((int*)&pipes);
+	if ( ! pipe((int*)&pipes) ) {
+		return -1;
+	}
 	if (argc != 2) {
 		return -1;
 	}
@@ -54,7 +58,10 @@ int main(int argc, char** argv) {
 		}
 	}
 	char winning_basilisk[BASILISK_LENGTH];
-	read(pipes[0], winning_basilisk, BASILISK_LENGTH);
+	if ( read(pipes[0], winning_basilisk, BASILISK_LENGTH) < 0 ) {
+		fprintf( stderr, "failure reading result\n" );
+		return -1;
+	}
 	printf("%s\n", winning_basilisk);
 
 	return 0;

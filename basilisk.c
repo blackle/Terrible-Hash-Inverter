@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
 #include <stdint.h>
@@ -10,7 +12,14 @@ static const char letters[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLM
 void randomize_nonce(basilisk_ctx* basilisk) {
 	uint32_t randomness[NONCE_LENGTH];
 	int fd = open("/dev/urandom", O_RDONLY);
-	read(fd, randomness, sizeof(uint32_t)*NONCE_LENGTH);
+	if ( fd < 0 ) {
+		fprintf( stderr, "error opening /dev/urandom\n" );
+		exit(-1);
+	}
+	if ( read(fd, randomness, sizeof(uint32_t)*NONCE_LENGTH) < 0 ) {
+		fprintf( stderr, "error reading /dev/urandom\n" );
+		exit(-1);
+	}
 	close(fd);
 
 	char * start = basilisk->data+20;
