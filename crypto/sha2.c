@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#ifdef __has_include
 #if __has_include("byteswap.h")
+#define __bswap_32 bswap_32
 #include <byteswap.h>
 #elif __has_include("machine/bswap.h")
 #include <machine/bswap.h>
@@ -11,7 +13,10 @@
 #elif __has_include("libkern/OSByteOrder.h")
 #include <libkern/OSByteOrder.h>
 #define __bswap_32 OSSwapInt32
-#else
+#endif
+#endif //__has_include
+
+#ifndef __bswap_32
 #pragma message "WARNING: using unaccelerated bswap32"
 inline uint32_t bswap32(uint32_t x) {
 	return (((x & 0xFF000000) >> 24) | ((x & 0x00FF0000) >> 8) | ((x & 0x0000FF00) << 8) | ((x & 0x000000FF) << 24));
