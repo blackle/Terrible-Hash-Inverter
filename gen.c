@@ -21,7 +21,7 @@ void find_basilisk(int pipe, int n) {
 	while (1) {
 		basilisk_step(&basilisk);
 
-		if (basilisk.ctx_final.s[0] == 0) {
+		if (basilisk.ctx_final.s[0] == 0 && basilisk.ctx_final.s[1] < (1 << 24)) {
 			break;
 		}
 	}
